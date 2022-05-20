@@ -68,7 +68,7 @@ def get_results_for_questions(questions: list[str]) -> list[dict]:
 def index():
     if request.method == "POST":
         q = request.form["query-input"]
-        q = str(q).strip()
+        q = str(q).strip().replace(" ", "-")
 
         max_num_of_questions = request.form["number-input"]
 
@@ -88,8 +88,11 @@ def getRelatedQuestions():
 
         if not query:
             return render_template("error.html", message="You must provide a query.")
+        else:
+            query = query.replace("-", " ")
 
         cache = read_cache()
+
         if request.url in cache and is_cache_valid(
             cache.get(request.url).get("time"),
         ):
@@ -139,7 +142,7 @@ def getRelatedQuestions():
     strIO.close()
 
     return send_file(
-        memory, attachment_filename=f"{query.replace(' ', '')}.html", as_attachment=True,
+        memory, attachment_filename=f"{query.replace(' ', '-')}.html", as_attachment=True,
     )
 
 
