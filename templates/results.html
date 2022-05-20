@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>People Also Ask</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .hidden {
+        display: none;
+      }
+      .cards {
+        margin-bottom: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="query">{{ query }}</h1>
+    <div class="summary">
+      <ul>
+        {% for i in range(0, len_) %}
+        <li>
+          <a href="{{ '#' + results[i]['question'] }}"
+            >{{ results[i]["question"] }}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="cards">
+      {% for i in range(0, len_) %}
+      <div class="card">
+        <h1 id="{{ results[i]['question'] }}" class="question">
+          {{ results[i]["question"] }}
+        </h1>
+        <div class="answer">
+          {% autoescape false %} {{ results[i]["answer"] }} {% endautoescape %}
+        </div>
+        <a href="{{ results[i]['link'] }}">Read more</a>
+      </div>
+      {% endfor %}
+    </div>
+    <form method="post" target="_blank">
+      <button type="submit">Download as HTML</button>
+      <div class="hidden">
+        <input name="query" type="text" value="{{ query }}" />
+        <input name="max" type="text" value="{{ max }}" />
+      </div>
+    </form>
+  </body>
+</html>
