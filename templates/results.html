@@ -24,7 +24,7 @@
       <ul>
         {% for i in range(0, len_) %}
         <li>
-          <a href="{{ '#' + results[i]['question'] }}"
+          <a href="{{ '#' + results[i]['id'] }}"
             >{{ results[i]["question"] }}</a
           >
         </li>
@@ -34,7 +34,7 @@
     <div class="cards">
       {% for i in range(0, len_) %}
       <div class="card">
-        <h1 id="{{ results[i]['question'] }}" class="question">
+        <h1 id="{{ results[i]['id'] }}" class="question">
           {{ results[i]["question"] }}
         </h1>
         <div class="answer">

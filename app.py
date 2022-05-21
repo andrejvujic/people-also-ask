@@ -55,6 +55,7 @@ def get_results_for_questions(questions: list[str]) -> list[dict]:
         if a["has_answer"]:
             results.append(
                 {
+                    "id": q.replace(" ", "-"),
                     "question": q,
                     "answer": a["response"].replace("\n", "<br>"),
                     "link": a["link"],
