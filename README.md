@@ -1,6 +1,6 @@
 # People Also Ask
 
-A Python web to search for related questions by query/keyword. It works by using a library to scrape Google search results.
+A Python app web to search for related questions by query/keyword. It works by using a library to scrape Google search results.
 
 # Dependencies
 
