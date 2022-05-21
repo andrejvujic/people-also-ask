@@ -13,8 +13,8 @@
       .hidden {
         display: none;
       }
-      .cards {
-        margin-bottom: 48px;
+      form {
+        margin-top: 48px;
       }
     </style>
   </head>
@@ -44,6 +44,7 @@
       </div>
       {% endfor %}
     </div>
+    {% if not in_download_mode %}
     <form method="post" target="_blank">
       <button type="submit">Download as HTML</button>
       <div class="hidden">
@@ -51,5 +52,6 @@
         <input name="max" type="text" value="{{ max }}" />
       </div>
     </form>
+    {% endif %}
   </body>
 </html>

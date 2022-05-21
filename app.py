@@ -129,7 +129,7 @@ def getRelatedQuestions():
     strIO = StringIO()
     strIO.write(
         render_template(
-            'results.html', request_url=request.url, query=query, max=max, results=results, len_=len(results),
+            'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
         ),
     )
 
