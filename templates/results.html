@@ -40,7 +40,7 @@
         <div class="answer">
           {% autoescape false %} {{ results[i]["answer"] }} {% endautoescape %}
         </div>
-        <a href="{{ results[i]['link'] }}">Read more</a>
+        <a href="{{ results[i]['link'] }}" target="_blank">Read more</a>
       </div>
       {% endfor %}
     </div>
