@@ -25,6 +25,49 @@ cwd = os.path.dirname(
 cache_file_path = os.path.join(cwd, ".cache")
 
 
+def open_stats(file_path: str) -> None:
+    stats = dict(
+        {
+            "start": datetime.utcnow(),
+            "succesful": 0,
+            "failed": 0,
+        }
+    )
+
+    write_stats(file_path, stats)
+
+
+def stats_increase_succesful(file_path: str) -> None:
+    stats = read_stats(file_path)
+    stats["succesful"] = stats["succesful"] + 1
+    write_stats(file_path, stats)
+
+
+def stats_increase_failed(file_path: str) -> None:
+    stats = read_stats(file_path)
+    stats["failed"] = stats["failed"] + 1
+    write_stats(file_path, stats)
+
+
+def close_stats(file_path: str) -> None:
+    stats = read_stats(file_path)
+    stats["end"] = datetime.utcnow()
+    write_stats(file_path, stats)
+
+
+def write_stats(file_path: str, stats: dict) -> None:
+    with open(file_path, "wb") as f:
+        pickle.dump(
+            stats,
+            f,
+        )
+
+
+def read_stats(file_path: str) -> dict:
+    with open(file_path, "rb") as f:
+        return pickle.load(f)
+
+
 def write_cache(obj: dict) -> None:
     with open(cache_file_path, "wb") as f:
         pickle.dump(obj, f)
@@ -212,12 +255,18 @@ def multiple():
     max_num_of_questions = request.form["number-input"]
     delay_between_searching = request.form["delay-input"]
 
+    stats_file_path = os.path.join(
+        session_dir_path, ".stats"
+    )
+
+    open_stats(stats_file_path)
+
     return redirect(
         f"/multiple/getRelatedQuestions?session={session}&index=1&max={max_num_of_questions}&delay={delay_between_searching}"
     )
 
 
-@app.route("/multiple/getRelatedQuestions", methods=["GET"])
+@ app.route("/multiple/getRelatedQuestions", methods=["GET"])
 def multipleGetRelatedQuestions():
     args = request.args
 
@@ -245,6 +294,10 @@ def multipleGetRelatedQuestions():
         session_dir_path, ".queries",
     )
 
+    stats_file_path = os.path.join(
+        session_dir_path, ".stats"
+    )
+
     queries = []
     if not os.path.isfile(queries_file_path):
         return render_template("error.html", "We encountered an error while trying to parse the queries...")
@@ -256,6 +309,7 @@ def multipleGetRelatedQuestions():
         query = queries[index - 1]
         query = query.strip()
     except:
+        close_stats(stats_file_path)
         return redirect(f"/multiple/results?session={session}")
 
     cache = read_cache()
@@ -270,6 +324,8 @@ def multipleGetRelatedQuestions():
         results = get_results_for_questions(questions=questions)
 
     if len(results):
+        stats_increase_succesful(stats_file_path)
+
         cache = read_cache()
         cache[cache_id] = {
             "data": results,
@@ -310,10 +366,11 @@ def multipleGetRelatedQuestions():
 
         return render_template("delay.html", delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
+    stats_increase_failed(stats_file_path)
     return render_template("delay.html", delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
 
-@app.route("/multiple/results")
+@ app.route("/multiple/results")
 def multipleResults():
     args = request.args
     session = args.get("session")
@@ -338,7 +395,20 @@ def multipleResults():
 
         os.chdir(_cwd)
 
-        return render_template("multiple-results.html")
+        queries_file_path = os.path.join(
+            session_dir_path, ".queries",
+        )
+        stats_file_path = os.path.join(
+            session_dir_path, ".stats"
+        )
+
+        queries = []
+        with open(queries_file_path, "rb") as f:
+            queries = pickle.load(f)
+
+        stats = read_stats(stats_file_path)
+
+        return render_template("multiple-results.html", session=session, stats=stats, queries=queries)
 
     return render_template("error.html", message="We weren't able to find any results...")
 
