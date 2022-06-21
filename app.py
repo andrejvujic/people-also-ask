@@ -129,7 +129,7 @@ def getRelatedQuestions():
 
         if len(results):
             return render_template(
-                "results.html", request_url=request.url, query=query, max=max, results=results, len_=len(results),
+                "single-results.html", request_url=request.url, query=query, max=max, results=results, len_=len(results),
             )
 
         return render_template(
@@ -150,7 +150,7 @@ def getRelatedQuestions():
     strIO = StringIO()
     strIO.write(
         render_template(
-            'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
+            'single-results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
         ),
     )
 
@@ -254,7 +254,7 @@ def multipleGetRelatedQuestions():
         strIO = StringIO()
         strIO.write(
             render_template(
-                'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
+                'single-results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
             ),
         )
 
