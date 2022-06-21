@@ -87,7 +87,7 @@ def index():
 
         max_num_of_questions = request.form["number-input"]
 
-        return redirect(f"/getRelatedQuestions?q={q}&max={max_num_of_questions}")
+        return redirect(f"/single/getRelatedQuestions?q={q}&max={max_num_of_questions}")
 
     return render_template("index.html")
 
@@ -188,9 +188,44 @@ def multiple():
         pickle.dump(queries, f)
 
     max_num_of_questions = request.form["number-input"]
-    delay_between_search = request.form["delay-input"]
+    delay_between_searching = request.form["delay-input"]
 
-    return session
+    return redirect(
+        f"/multiple/getRelatedQuestions?session={session}&index=1&max={max_num_of_questions}&delay={delay_between_searching}"
+    )
+
+
+@app.route("/multiple/getRelatedQuestions", methods=["GET"])
+def multipleGetRelatedQuestions():
+    args = request.args
+
+    session = args.get("session")
+
+    index = int(
+        args.get("index"),
+    )
+
+    max = args.get("max")
+    delay = args.get("delay")
+
+    session_dir_path = os.path.join(
+        ROOT, UPLOAD_FOLDER, session,
+    )
+
+    if not os.path.isdir(session_dir_path):
+        os.mkdir(session_dir_path)
+
+    queries_file_path = os.path.join(
+        session_dir_path, ".queries",
+    )
+
+    queries = []
+    with open(queries_file_path, "rb") as f:
+        queries = pickle.load(f)
+
+    query = queries[index - 1]
+
+    return query
 
 
 if __name__ == "__main__":
