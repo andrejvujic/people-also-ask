@@ -1,4 +1,3 @@
-from crypt import methods
 from datetime import datetime
 from io import StringIO, BytesIO
 import os
@@ -282,7 +281,7 @@ def multipleGetRelatedQuestions():
             memory.getbuffer(),
         )
 
-    return "Done"
+    return render_template("delay.html"), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
 
 if __name__ == "__main__":
