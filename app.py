@@ -250,36 +250,39 @@ def multipleGetRelatedQuestions():
         }
         write_cache(cache)
 
-    strIO = StringIO()
-    strIO.write(
-        render_template(
-            'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
-        ),
-    )
-
-    memory = BytesIO()
-    memory.write(
-        strIO.getvalue().encode(),
-    )
-    memory.seek(0)
-
-    strIO.close()
-
-    results_path = os.path.join(
-        session_dir_path, "results",
-    )
-    if not os.path.isdir(results_path):
-        os.mkdir(results_path)
-
-    file_name = f"{query.replace(' ', '-')}.html"
-    file_path = os.path.join(
-        results_path, file_name,
-    )
-
-    with open(file_path, "wb") as f:
-        f.write(
-            memory.getbuffer(),
+    if len(results):
+        strIO = StringIO()
+        strIO.write(
+            render_template(
+                'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
+            ),
         )
+
+        memory = BytesIO()
+        memory.write(
+            strIO.getvalue().encode(),
+        )
+        memory.seek(0)
+
+        strIO.close()
+
+        results_path = os.path.join(
+            session_dir_path, "results",
+        )
+        if not os.path.isdir(results_path):
+            os.mkdir(results_path)
+
+        file_name = f"{query.replace(' ', '-')}.html"
+        file_path = os.path.join(
+            results_path, file_name,
+        )
+
+        with open(file_path, "wb") as f:
+            f.write(
+                memory.getbuffer(),
+            )
+
+        return render_template("delay.html"), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
     return render_template("delay.html"), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
