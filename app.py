@@ -1,4 +1,5 @@
 from datetime import datetime
+from email import message
 from io import StringIO, BytesIO
 import os
 from flask import Flask, render_template, redirect, send_file, request
@@ -222,15 +223,16 @@ def multipleGetRelatedQuestions():
 
     session = args.get("session")
 
-    index = int(
-        args.get("index"),
-    )
-    max = int(
-        args.get("max"),
-    )
-    delay = int(
-        args.get("delay"),
-    )
+    index = args.get("index"),
+    max = args.get("max"),
+    delay = args.get("delay"),
+
+    if not session or not index:
+        return render_template("error.html", message="We encountered an error while trying to parse your request.")
+
+    index = int(index)
+    max = int(max) if max else 10
+    delay = int(delay) if delay else 5
 
     session_dir_path = os.path.join(
         ROOT, UPLOAD_FOLDER, session,
@@ -244,6 +246,9 @@ def multipleGetRelatedQuestions():
     )
 
     queries = []
+    if not os.path.isfile(queries_file_path):
+        return render_template("error.html", "We encountered an error while trying to parse the queries...")
+
     with open(queries_file_path, "rb") as f:
         queries = pickle.load(f)
 
@@ -320,17 +325,22 @@ def multipleResults():
     _cwd = os.getcwd()
     os.chdir(session_dir_path)
 
-    with zipfile.ZipFile("results.zip", "w") as f:
-        files = os.listdir("files")
-        for file in files:
+    if len(
+        os.listdir("files")
+    ) > 0:
+        with zipfile.ZipFile("results.zip", "w") as f:
+            files = os.listdir("files")
+            for file in files:
 
-            f.write(
-                os.path.join("files", file), os.path.basename(file),
-            )
+                f.write(
+                    os.path.join("files", file), os.path.basename(file),
+                )
 
-    os.chdir(_cwd)
+        os.chdir(_cwd)
 
-    return ""
+        return ""
+
+    return render_template("error.html", message="We weren't able to find any results...")
 
 
 if __name__ == "__main__":
