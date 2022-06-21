@@ -39,6 +39,10 @@ def read_cache() -> dict:
         return pickle.load(f)
 
 
+def get_request_cache_id(query: str, max: int):
+    return f"{query}-{max}"
+
+
 if not os.path.isfile(cache_file_path):
     write_cache(
         dict({}),
@@ -107,17 +111,18 @@ def getRelatedQuestions():
             query = query.replace("-", " ")
 
         cache = read_cache()
+        cache_id = get_request_cache_id(query, max)
 
-        if request.url in cache and is_cache_valid(
-            cache.get(request.url).get("time"),
+        if cache_id in cache and is_cache_valid(
+            cache.get(cache_id).get("time"),
         ):
-            results = cache.get(request.url).get("data")
+            results = cache.get(cache_id).get("data")
         else:
             questions = get_questions_for_query(query=query, max=max)
             results = get_results_for_questions(questions=questions)
 
             cache = read_cache()
-            cache[request.url] = {
+            cache[cache_id] = {
                 "data": results,
                 "time": datetime.utcnow(),
             }
@@ -132,11 +137,13 @@ def getRelatedQuestions():
             "error.html", request_url=request.url, message=f"No related questions for {query}, please try again later...",
         )
 
-    cache = read_cache()
-    results = cache.get(request.url)["data"]
-
     query = request.form["query"]
     max = request.form["max"]
+
+    cache = read_cache()
+    cache_id = get_request_cache_id(query, max)
+
+    results = cache.get(cache_id)["data"]
 
     if not query or not max or not results:
         return render_template("error.html", message="We encountered an error while trying to save the site...")
@@ -224,8 +231,58 @@ def multipleGetRelatedQuestions():
         queries = pickle.load(f)
 
     query = queries[index - 1]
+    query = query.strip()
 
-    return query
+    cache = read_cache()
+    cache_id = get_request_cache_id(query, max)
+
+    if cache_id in cache and is_cache_valid(
+        cache.get(cache_id).get("time"),
+    ):
+        results = cache.get(cache_id).get("data")
+    else:
+        questions = get_questions_for_query(query=query, max=max)
+        results = get_results_for_questions(questions=questions)
+
+        cache = read_cache()
+        cache[cache_id] = {
+            "data": results,
+            "time": datetime.utcnow(),
+        }
+        write_cache(cache)
+
+    strIO = StringIO()
+    strIO.write(
+        render_template(
+            'results.html', request_url=request.url, in_download_mode=True, query=query, max=max, results=results, len_=len(results),
+        ),
+    )
+
+    memory = BytesIO()
+    memory.write(
+        strIO.getvalue().encode(),
+    )
+    memory.seek(0)
+
+    strIO.close()
+
+    results_path = os.path.join(
+        session_dir_path, "results",
+    )
+    if not os.path.isdir(results_path):
+        os.mkdir(results_path)
+
+    file_name = f"{query.replace(' ', '-')}.html"
+    file_path = os.path.join(
+        results_path, file_name,
+    )
+
+    with open(file_path, "wb") as f:
+        f.write(
+            memory.getbuffer(),
+        )
+
+    return "Done"
 
 
 if __name__ == "__main__":
