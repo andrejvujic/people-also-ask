@@ -10,6 +10,13 @@ import people_also_ask
 
 app = Flask(__name__)
 
+ROOT = os.path.dirname(__file__)
+UPLOAD_FOLDER = os.path.join(ROOT, "static")
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.mkdir(UPLOAD_FOLDER)
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 cwd = os.path.dirname(
     os.path.abspath(__file__),
@@ -161,15 +168,29 @@ def multiple():
             "multiple.html",
         )
 
-    session_id = get_random_id()
+    session = get_random_id()
 
     queries = request.form["queries-input"]
     queries = queries.splitlines()
 
+    session_dir_path = os.path.join(
+        ROOT, UPLOAD_FOLDER, session,
+    )
+
+    if not os.path.isdir(session_dir_path):
+        os.mkdir(session_dir_path)
+
+    queries_file_path = os.path.join(
+        session_dir_path, ".queries",
+    )
+
+    with open(queries_file_path, "wb") as f:
+        pickle.dump(queries, f)
+
     max_num_of_questions = request.form["number-input"]
     delay_between_search = request.form["delay-input"]
 
-    return session_id
+    return session
 
 
 if __name__ == "__main__":
