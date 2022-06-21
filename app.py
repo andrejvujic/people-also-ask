@@ -68,18 +68,19 @@ def get_questions_for_query(query: str, max: int) -> list[str]:
 def get_results_for_questions(questions: list[str]) -> list[dict]:
     results = []
 
-    for q in questions:
-        a = people_also_ask.get_answer(q)
+    if len(questions) > 0:
+        for q in questions:
+            a = people_also_ask.get_answer(q)
 
-        if a["has_answer"]:
-            results.append(
-                {
-                    "id": q.replace(" ", "-"),
-                    "question": q,
-                    "answer": a["response"].replace("\n", "<br>"),
-                    "link": a["link"],
-                }
-            )
+            if a["has_answer"]:
+                results.append(
+                    {
+                        "id": q.replace(" ", "-"),
+                        "question": q,
+                        "answer": a["response"].replace("\n", "<br>"),
+                        "link": a["link"],
+                    }
+                )
 
     return results
 
