@@ -122,6 +122,7 @@ def getRelatedQuestions():
             questions = get_questions_for_query(query=query, max=max)
             results = get_results_for_questions(questions=questions)
 
+        if len(results):
             cache = read_cache()
             cache[cache_id] = {
                 "data": results,
@@ -129,7 +130,6 @@ def getRelatedQuestions():
             }
             write_cache(cache)
 
-        if len(results):
             return render_template(
                 "single-results.html", request_url=request.url, query=query, max=max, results=results, len_=len(results),
             )
@@ -251,6 +251,7 @@ def multipleGetRelatedQuestions():
         questions = get_questions_for_query(query=query, max=max)
         results = get_results_for_questions(questions=questions)
 
+    if len(results):
         cache = read_cache()
         cache[cache_id] = {
             "data": results,
@@ -258,7 +259,6 @@ def multipleGetRelatedQuestions():
         }
         write_cache(cache)
 
-    if len(results):
         strIO = StringIO()
         strIO.write(
             render_template(
