@@ -60,7 +60,8 @@ def get_questions_for_query(query: str, max: int) -> list[str]:
         return people_also_ask.get_related_questions(
             query, max_nb_questions=max,
         )
-    except Exception:
+    except Exception as e:
+        print(e)
         return []
 
 
@@ -211,9 +212,12 @@ def multipleGetRelatedQuestions():
     index = int(
         args.get("index"),
     )
-
-    max = args.get("max")
-    delay = args.get("delay")
+    max = int(
+        args.get("max"),
+    )
+    delay = int(
+        args.get("delay"),
+    )
 
     session_dir_path = os.path.join(
         ROOT, UPLOAD_FOLDER, session,
