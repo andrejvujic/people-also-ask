@@ -369,10 +369,10 @@ def multipleGetRelatedQuestions():
                 memory.getbuffer(),
             )
 
-        return render_template("delay.html", delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
+        return render_template("delay.html", index=index, delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
     stats_increase_failed(stats_file_path)
-    return render_template("delay.html", delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
+    return render_template("delay.html", index=index, delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
 
 @app.route("/multiple/results", methods=["GET", "POST"])
