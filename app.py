@@ -160,7 +160,7 @@ def single():
 
 
 @app.route("/single/getRelatedQuestions", methods=["GET", "POST"])
-def getRelatedQuestions():
+def singleGetRelatedQuestions():
     if request.method == "GET":
         args = request.args
         query = args.get("q")
