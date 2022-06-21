@@ -3,6 +3,7 @@ from io import StringIO, BytesIO
 import os
 from flask import Flask, render_template, redirect, send_file, request
 import pickle
+import zipfile
 from random import choice
 import people_also_ask
 
@@ -229,8 +230,11 @@ def multipleGetRelatedQuestions():
     with open(queries_file_path, "rb") as f:
         queries = pickle.load(f)
 
-    query = queries[index - 1]
-    query = query.strip()
+    try:
+        query = queries[index - 1]
+        query = query.strip()
+    except:
+        return redirect(f"/multiple/results?session={session}")
 
     cache = read_cache()
     cache_id = get_request_cache_id(query, max)
@@ -267,7 +271,7 @@ def multipleGetRelatedQuestions():
         strIO.close()
 
         results_path = os.path.join(
-            session_dir_path, "results",
+            session_dir_path, "files",
         )
         if not os.path.isdir(results_path):
             os.mkdir(results_path)
@@ -285,6 +289,31 @@ def multipleGetRelatedQuestions():
         return render_template("delay.html"), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
     return render_template("delay.html"), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
+
+
+@app.route("/multiple/results")
+def multipleResults():
+    args = request.args
+    session = args.get("session")
+
+    session_dir_path = os.path.join(
+        ROOT, UPLOAD_FOLDER, session,
+    )
+
+    _cwd = os.getcwd()
+    os.chdir(session_dir_path)
+
+    with zipfile.ZipFile("results.zip", "w") as f:
+        files = os.listdir("files")
+        for file in files:
+
+            f.write(
+                os.path.join("files", file), os.path.basename(file),
+            )
+
+    os.chdir(_cwd)
+
+    return ""
 
 
 if __name__ == "__main__":
