@@ -435,8 +435,14 @@ def multipleResults():
         "results.zip",
     )
 
+    memory = None
+    with open(results_file_path, "rb") as f:
+        memory = BytesIO(
+            f.read(),
+        )
+
     return send_file(
-        results_file_path,
+        memory, as_attachment=True, attachment_filename="results.zip",
     )
 
 
