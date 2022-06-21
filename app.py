@@ -1,3 +1,4 @@
+from asyncore import write
 from crypt import methods
 from datetime import datetime
 from email import message
@@ -391,6 +392,45 @@ def multipleResults():
 
         _cwd = os.getcwd()
         os.chdir(session_dir_path)
+
+        queries = []
+        with open(
+            os.path.join(session_dir_path, ".queries"),
+            "rb",
+        ) as f:
+            queries = pickle.load(f)
+
+        links = [f"{query.replace(' ', '-')}.html" for query in queries]
+        for index, link in enumerate(links):
+            if not os.path.isfile(
+                os.path.join("files", link)
+            ):
+                links.pop(index)
+
+        strIO = StringIO()
+        strIO.write(
+            render_template(
+                'link-everything.html', queries=queries, links=links, len_=len(queries),
+            ),
+        )
+
+        memory = BytesIO()
+        memory.write(
+            strIO.getvalue().encode(),
+        )
+        memory.seek(0)
+
+        strIO.close()
+
+        with open(
+            os.path.join(
+                session_dir_path, "files", "index.html",
+            ),
+            "wb",
+        ) as f:
+            f.write(
+                memory.getbuffer(),
+            )
 
         if len(
             os.listdir("files")
