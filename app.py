@@ -309,7 +309,7 @@ def multipleGetRelatedQuestions():
 
     queries = []
     if not os.path.isfile(queries_file_path):
-        return render_template("error.html", "We encountered an error while trying to parse the queries...")
+        return render_template("error.html", message="We encountered an error while trying to parse the queries...")
 
     with open(queries_file_path, "rb") as f:
         queries = pickle.load(f)
