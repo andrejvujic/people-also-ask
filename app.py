@@ -1,8 +1,10 @@
+from crypt import methods
 from datetime import datetime
 from io import StringIO, BytesIO
 import os
 from flask import Flask, render_template, redirect, send_file, request
 import pickle
+from random import choice
 import people_also_ask
 
 
@@ -18,6 +20,11 @@ cache_file_path = os.path.join(cwd, ".cache")
 def write_cache(obj: dict) -> None:
     with open(cache_file_path, "wb") as f:
         pickle.dump(obj, f)
+
+
+def get_random_id(length: int = 10) -> str:
+    _ = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    return "".join([str(choice(_)) for i in range(length)])
 
 
 def read_cache() -> dict:
@@ -78,7 +85,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/getRelatedQuestions", methods=["GET", "POST"])
+@app.route("/single/getRelatedQuestions", methods=["GET", "POST"])
 def getRelatedQuestions():
     if request.method == "GET":
         args = request.args
@@ -145,6 +152,24 @@ def getRelatedQuestions():
     return send_file(
         memory, attachment_filename=f"{query.replace(' ', '-')}.html", as_attachment=True,
     )
+
+
+@app.route("/multiple", methods=["GET", "POST"])
+def multiple():
+    if request.method == "GET":
+        return render_template(
+            "multiple.html",
+        )
+
+    session_id = get_random_id()
+
+    queries = request.form["queries-input"]
+    queries = queries.splitlines()
+
+    max_num_of_questions = request.form["number-input"]
+    delay_between_search = request.form["delay-input"]
+
+    return session_id
 
 
 if __name__ == "__main__":
