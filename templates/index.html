@@ -10,39 +10,23 @@
       * {
         font-family: "Inter", sans-serif;
       }
-      .query-section input {
-        width: 256px;
+      form button {
+        width: 84px;
       }
-      .number-section {
-        margin: 16px 0px;
-        display: flex;
-        flex-flow: column;
-      }
-      .number-section input {
-        width: 72px;
+      .space {
+        height: 16px;
       }
     </style>
   </head>
   <body>
     <h1>People Also Ask</h1>
     <h2>Search related questions</h2>
-    <form method="post" target="_blank">
-      <div class="query-section">
-        <input
-          required
-          type="text"
-          name="query-input"
-          placeholder="Enter your query..."
-        />
-      </div>
-
-      <div class="number-section">
-        <label for="number-input">Max. number of questions</label>
-        <input required type="number" name="number-input" min="1" />
-      </div>
-
-      <button type="submit" name="submit-button" id="submit-button">
-        Search
+    <p>Please pick a search method:</p>
+    <form method="post">
+      <button value="single" name="search-type" type="submit">Single</button>
+      <div class="space"></div>
+      <button value="multiple" name="search-type" type="submit">
+        Multiple
       </button>
     </form>
   </body>

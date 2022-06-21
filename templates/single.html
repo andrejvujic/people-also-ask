@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>People Also Ask</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      .query-section input {
+        width: 256px;
+      }
+      .number-section {
+        margin: 16px 0px;
+        display: flex;
+        flex-flow: column;
+      }
+      .number-section input {
+        width: 72px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>People Also Ask</h1>
+    <h2>Search related questions</h2>
+    <form method="post" target="_blank">
+      <div class="query-section">
+        <input
+          required
+          type="text"
+          name="query-input"
+          placeholder="Enter your query..."
+        />
+      </div>
+
+      <div class="number-section">
+        <label for="number-input">Max. number of questions</label>
+        <input required type="number" name="number-input" min="1" />
+      </div>
+
+      <button type="submit" name="submit-button" id="submit-button">
+        Search
+      </button>
+    </form>
+  </body>
+</html>

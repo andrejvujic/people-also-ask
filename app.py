@@ -87,6 +87,18 @@ def get_results_for_questions(questions: list[str]) -> list[dict]:
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    if request.method == "GET":
+        return render_template("index.html")
+
+    form = request.form
+    if form["search-type"] == "single":
+        return redirect("/single")
+
+    return redirect("/multiple")
+
+
+@app.route("/single", methods=["GET", "POST"])
+def single():
     if request.method == "POST":
         q = request.form["query-input"]
         q = str(q).strip().replace(" ", "-")
@@ -95,7 +107,7 @@ def index():
 
         return redirect(f"/single/getRelatedQuestions?q={q}&max={max_num_of_questions}")
 
-    return render_template("index.html")
+    return render_template("single.html")
 
 
 @app.route("/single/getRelatedQuestions", methods=["GET", "POST"])
