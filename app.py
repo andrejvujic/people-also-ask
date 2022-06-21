@@ -338,7 +338,7 @@ def multipleResults():
 
         os.chdir(_cwd)
 
-        return ""
+        return render_template("multiple-results.html")
 
     return render_template("error.html", message="We weren't able to find any results...")
 
