@@ -1,3 +1,4 @@
+from crypt import methods
 from datetime import datetime
 from email import message
 from io import StringIO, BytesIO
@@ -266,7 +267,7 @@ def multiple():
     )
 
 
-@ app.route("/multiple/getRelatedQuestions", methods=["GET"])
+@app.route("/multiple/getRelatedQuestions", methods=["GET"])
 def multipleGetRelatedQuestions():
     args = request.args
 
@@ -275,6 +276,10 @@ def multipleGetRelatedQuestions():
     index = args.get("index"),
     max = args.get("max"),
     delay = args.get("delay"),
+
+    index = index[0]
+    max = max[0]
+    delay = delay[0]
 
     if not session or not index:
         return render_template("error.html", message="We encountered an error while trying to parse your request.")
@@ -370,47 +375,69 @@ def multipleGetRelatedQuestions():
     return render_template("delay.html", delay=delay), {"Refresh": f"{delay}; url={request.host_url}multiple/getRelatedQuestions?session={session}&index={index + 1}&max={max}&delay={delay}"}
 
 
-@ app.route("/multiple/results")
+@app.route("/multiple/results", methods=["GET", "POST"])
 def multipleResults():
-    args = request.args
-    session = args.get("session")
+    if request.method == "GET":
+        args = request.args
+        session = args.get("session")
+
+        session_dir_path = os.path.join(
+            ROOT, UPLOAD_FOLDER, session,
+        )
+
+        _cwd = os.getcwd()
+        os.chdir(session_dir_path)
+
+        if len(
+            os.listdir("files")
+        ) > 0:
+            with zipfile.ZipFile("results.zip", "w") as f:
+                files = os.listdir("files")
+                for file in files:
+
+                    f.write(
+                        os.path.join("files", file), os.path.basename(file),
+                    )
+
+            os.chdir(_cwd)
+
+            queries_file_path = os.path.join(
+                session_dir_path, ".queries",
+            )
+            stats_file_path = os.path.join(
+                session_dir_path, ".stats"
+            )
+
+            queries = []
+            with open(queries_file_path, "rb") as f:
+                queries = pickle.load(f)
+
+            stats = read_stats(stats_file_path)
+
+            duration = stats["end"] - stats["start"]
+            duration = int(
+                duration.total_seconds(),
+            )
+
+            return render_template("multiple-results.html", session=session, stats=stats, queries=queries, succesful=stats["succesful"], failed=stats["failed"], duration=duration)
+
+        return render_template("error.html", message="We weren't able to find any results...")
+
+    form = request.form
+    session = form["session"]
 
     session_dir_path = os.path.join(
         ROOT, UPLOAD_FOLDER, session,
     )
 
-    _cwd = os.getcwd()
-    os.chdir(session_dir_path)
+    results_file_path = os.path.join(
+        session_dir_path,
+        "results.zip",
+    )
 
-    if len(
-        os.listdir("files")
-    ) > 0:
-        with zipfile.ZipFile("results.zip", "w") as f:
-            files = os.listdir("files")
-            for file in files:
-
-                f.write(
-                    os.path.join("files", file), os.path.basename(file),
-                )
-
-        os.chdir(_cwd)
-
-        queries_file_path = os.path.join(
-            session_dir_path, ".queries",
-        )
-        stats_file_path = os.path.join(
-            session_dir_path, ".stats"
-        )
-
-        queries = []
-        with open(queries_file_path, "rb") as f:
-            queries = pickle.load(f)
-
-        stats = read_stats(stats_file_path)
-
-        return render_template("multiple-results.html", session=session, stats=stats, queries=queries)
-
-    return render_template("error.html", message="We weren't able to find any results...")
+    return send_file(
+        results_file_path,
+    )
 
 
 if __name__ == "__main__":

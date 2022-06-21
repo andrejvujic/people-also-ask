@@ -10,7 +10,31 @@
       * {
         font-family: "Inter", sans-serif;
       }
+      input[hidden] {
+        display: none;
+      }
     </style>
   </head>
-  <body></body>
+  <body>
+    <div class="queries">
+      <h1>Queries</h1>
+      <ul>
+        {% for query in queries %}
+        <li class="query">{{ query }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="stats">
+      <h1>Statistics</h1>
+      <ul>
+        <li class="succesful">Succesful - {{ succesful }}</li>
+        <li class="failed">Failed - {{ failed }}</li>
+        <li class="duration">Duration: {{ duration }}s</li>
+      </ul>
+    </div>
+    <form target="_blank" method="post">
+      <input hidden type="text" name="session" value="{{ session }}" />
+      <button type="submit">Download results</button>
+    </form>
+  </body>
 </html>
