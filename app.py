@@ -3,6 +3,7 @@ from datetime import datetime
 from email import message
 from io import StringIO, BytesIO
 import os
+import shutil
 from flask import Flask, render_template, redirect, send_file, request
 import pickle
 import zipfile
@@ -440,6 +441,14 @@ def multipleResults():
         memory = BytesIO(
             f.read(),
         )
+
+    shutil.rmtree(
+        os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            session,
+        ),
+        ignore_errors=True,
+    )
 
     return send_file(
         memory, as_attachment=True, attachment_filename="results.zip",
